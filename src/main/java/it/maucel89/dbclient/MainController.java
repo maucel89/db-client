@@ -1,13 +1,21 @@
 package it.maucel89.dbclient;
 
+import it.maucel89.dbclient.schema.SchemaController;
+import it.maucel89.dbclient.util.AbsController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -16,7 +24,7 @@ import java.util.Optional;
 /**
  * @author Mauro Celani
  */
-public class MainController {
+public class MainController extends AbsController {
 
 	public MainController() {
 		DbConnection.readDbConncections().forEach(connectionsViewData::add);
@@ -69,7 +77,29 @@ public class MainController {
 						dbConnection.getConnectionURL())) {
 
 					// Do something with the Connection
-					showAlert(AlertType.INFORMATION, "Connessione riuscita!");
+//					showAlert(AlertType.INFORMATION, "Connessione riuscita!");
+
+					try {
+						FXMLLoader loader = new FXMLLoader(
+							getClass().getResource("schema/schema.fxml"));
+						Stage stage = new Stage();
+						stage.setTitle("Schema Viewer");
+						stage.setScene(new Scene(loader.load()));
+
+						SchemaController controller =
+							loader.<SchemaController>getController();
+
+						controller.initData(dbConnection, conn);
+
+						stage.show();
+
+						// Hide this current window
+						((Node)(event.getSource())).getScene().getWindow()
+							.hide();
+					}
+					catch (IOException e) {
+						e.printStackTrace();
+					}
 
 				}
 				catch (SQLException ex) {
@@ -125,15 +155,6 @@ public class MainController {
 		connectionsListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 		});
 
-	}
-
-	private void showAlert(AlertType alertType, String message) {
-		Alert alert = new Alert(alertType);
-		alert.setTitle(alertType.name());
-		alert.setHeaderText(null);
-		alert.setContentText(message);
-
-		alert.showAndWait();
 	}
 
 }

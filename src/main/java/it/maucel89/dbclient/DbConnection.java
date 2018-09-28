@@ -144,6 +144,7 @@ public class DbConnection {
 
 	public String getConnectionURL() {
 		return "jdbc:mysql://" + hostname + ":" + port + "/" + schema +"?" +
-			   "user=" + username + "&password=" + password;
+			   "user=" + username + "&password=" + password +
+			   "&serverTimezone=UTC&useSSL=false";
 	}
 }
