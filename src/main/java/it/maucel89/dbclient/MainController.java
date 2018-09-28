@@ -73,9 +73,7 @@ public class MainController extends AbsController {
 
 				DbConnection dbConnection = selectedItems.get(0);
 
-				try (Connection conn = DriverManager.getConnection(
-						dbConnection.getConnectionURL())) {
-
+				try {
 					// Do something with the Connection
 //					showAlert(AlertType.INFORMATION, "Connessione riuscita!");
 
@@ -89,7 +87,7 @@ public class MainController extends AbsController {
 						SchemaController controller =
 							loader.<SchemaController>getController();
 
-						controller.initData(dbConnection, conn);
+						controller.initData(dbConnection);
 
 						stage.show();
 
@@ -151,9 +149,9 @@ public class MainController extends AbsController {
 //			};
 //		});
 
-		// Handle ListView selection changes.
-		connectionsListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-		});
+//		// Handle ListView selection changes.
+//		connectionsListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+//		});
 
 	}
 
