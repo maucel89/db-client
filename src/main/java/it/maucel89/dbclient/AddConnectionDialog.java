@@ -9,7 +9,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import javafx.util.Pair;
 
 /**
  * @author Mauro Celani
@@ -33,6 +32,9 @@ public class AddConnectionDialog extends Dialog {
 		TextField port = addField(
 			grid, new TextField(), "3306", "Port:");
 
+		TextField schema = addField(
+			grid, new TextField(), "Schema", "Schema:");
+
 		TextField username = addField(
 			grid, new TextField(), "Username", "Username:");
 
@@ -51,7 +53,21 @@ public class AddConnectionDialog extends Dialog {
 		// login button is clicked.
 		setResultConverter(dialogButton -> {
 			if (dialogButton == loginButtonType) {
-				return connectionName.getText();
+
+				String portStr = port.getText();
+				int portN = 3306;
+				if (!portStr.isEmpty()) {
+					try {
+						portN = Integer.parseInt(portStr);
+					}
+					catch (NumberFormatException e) {
+						// Save default 3306 port
+					}
+				}
+
+				return new DbConnection(
+					connectionName.getText(), hostname.getText(), portN,
+					schema.getText(), username.getText(), password.getText());
 			}
 			return null;
 		});
