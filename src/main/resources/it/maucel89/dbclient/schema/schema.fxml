@@ -103,7 +103,7 @@
                                     </children></AnchorPane>
                             </content>
                           </Tab>
-                           <Tab text="SQL">
+                           <Tab closable="false" text="SQL">
                              <content>
                                <AnchorPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                     <children>
