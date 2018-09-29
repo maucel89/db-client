@@ -1,6 +1,7 @@
 package it.maucel89.dbclient.schema;
 
 import it.maucel89.dbclient.DbConnection;
+import it.maucel89.dbclient.code.area.SQLCodeArea;
 import it.maucel89.dbclient.util.AbsController;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
@@ -15,6 +16,9 @@ import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.util.Callback;
+import org.fxmisc.flowless.VirtualizedScrollPane;
+import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.LineNumberFactory;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -43,6 +47,9 @@ public class SchemaController extends AbsController {
 
 	@FXML
 	private TableView dataTableView;
+
+	@FXML
+	private SQLCodeArea sqlCodeArea;
 
 	public void initData(DbConnection dbConnection) throws SQLException {
 
@@ -95,8 +102,14 @@ public class SchemaController extends AbsController {
 
 				populateSchemaColumns(dbmd, schema, table);
 				populateTableData(conn, schema, table);
+				populateSQLCodeArea(table);
 			}
 		);
+
+	}
+
+	private void populateSQLCodeArea(String table) {
+		sqlCodeArea.initCode("SELECT *\nFROM " + table + "\n;\n");
 	}
 
 	private void populateSchemaColumns(
@@ -136,17 +149,14 @@ public class SchemaController extends AbsController {
 
 			String sql = "SELECT ";
 
-			for (int i = 0; i < columns.size(); i++) {
-
-				String name = columns.get(i).getName();
-
-				sql += name + ", ";
-
-
+			for (Column column : columns) {
+				sql += column.getName() + ", ";
 			}
 			sql = sql.substring(0, sql.length() - 2);
 
 			sql += " FROM " + table;
+
+			// TODO Limit or Paginate
 
 			PreparedStatement statement = conn.prepareStatement(sql);
 
