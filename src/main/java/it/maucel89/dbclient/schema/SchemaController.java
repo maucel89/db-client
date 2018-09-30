@@ -24,6 +24,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Mauro Celani
@@ -96,23 +99,37 @@ public class SchemaController extends AbsController {
 
 		// Handle ListView selection changes.
 		tablesListView.getSelectionModel().selectedItemProperty().addListener(
-			(observable, oldValue, newValue) -> {
+			(observable, oldTable, newTable) -> {
 //				System.out.print(newValue);
 
 				String schema = dbConnection.getSchema();
-				String table = newValue;
 
-				populateSchemaColumns(dbmd, schema, table);
-				populateTableData(conn, schema, table);
-				populateSQLCodeArea(table);
+				List<Column> oldColumns = new ArrayList<>(
+					columnsTableView.getItems());
+
+				populateSchemaColumns(dbmd, schema, newTable);
+
+				List<Column> newColumns = new ArrayList<>(
+					columnsTableView.getItems());
+
+				populateTableData(conn, schema, newTable);
+				populateSQLCodeArea(oldTable, newTable, oldColumns, newColumns);
 			}
 		);
 
 	}
 
-	private void populateSQLCodeArea(String table) {
+	private void populateSQLCodeArea(
+		String oldTable, String newTable, List<Column> oldColumns,
+		List<Column> newColumns) {
+
 		sqlCodeArea.clear();
-		sqlCodeArea.initCode("SELECT *\nFROM " + table + "\n;\n");
+		sqlCodeArea.initCode("SELECT *\nFROM " + newTable + "\n;\n");
+
+
+		sqlCodeArea.initAutoCompletePopup(
+			oldTable, newTable, Column.toNameList(oldColumns),
+			Column.toNameList(newColumns));
 	}
 
 	private void populateSchemaColumns(

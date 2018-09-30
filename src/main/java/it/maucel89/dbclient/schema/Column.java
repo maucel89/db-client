@@ -2,6 +2,9 @@ package it.maucel89.dbclient.schema;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Mauro Celani
@@ -50,6 +53,11 @@ public class Column {
 			Boolean.parseBoolean(rs.getString("IS_NULLABLE")), //YES/NO
 			rs.getString("COLUMN_DEF")
 		);
+	}
+
+	public static List<String> toNameList(Collection<Column> columns) {
+		return columns.stream().map(Column::getName).collect(
+			Collectors.toList());
 	}
 
 	public String getName() {

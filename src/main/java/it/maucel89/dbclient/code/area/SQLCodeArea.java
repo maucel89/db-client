@@ -1,5 +1,9 @@
 package it.maucel89.dbclient.code.area;
 
+import com.jfoenix.controls.JFXAutoCompletePopup;
+import it.maucel89.dbclient.schema.Column;
+import javafx.collections.ObservableList;
+import javafx.geometry.Bounds;
 import javafx.scene.Scene;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
@@ -10,6 +14,7 @@ import org.reactfx.Subscription;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,8 +24,8 @@ import java.util.regex.Pattern;
 public class SQLCodeArea extends CodeArea {
 
 	private static final String[] KEYWORDS = new String[] {
-		"select", "from", "where", "join", "on",
-		"as", "order", "by", "limit"
+		"SELECT", "FROM", "WHERE", "JOIN", "ON",
+		"AS", "ORDER", "BY", "LIMIT"
 	};
 
 	private static final String KEYWORD_PATTERN =
@@ -29,6 +34,9 @@ public class SQLCodeArea extends CodeArea {
 	private static final Pattern PATTERN = Pattern.compile(
 		"(?i)(?<KEYWORD>" + KEYWORD_PATTERN + ")"
 	);
+
+	private JFXAutoCompletePopup<String> autoCompletePopup =
+		new JFXAutoCompletePopup<>();
 
 	public SQLCodeArea() {
 
@@ -57,6 +65,47 @@ public class SQLCodeArea extends CodeArea {
 		// TODO
 		// when no longer need syntax highlighting and wish to clean up memory
 		// leaks run: `cleanupWhenNoLongerNeedIt.unsubscribe();`
+
+
+		// AUTO COMPLETE
+		autoCompletePopup.getSuggestions().addAll(KEYWORDS);
+
+		autoCompletePopup.setSelectionHandler(event -> {
+			String selAutoCompEle = event.getObject();
+
+			int caretPos = getCaretPosition();
+			int wordStart;
+
+			for (
+				wordStart = 1;
+				selAutoCompEle.toLowerCase().contains(
+					getText(caretPos - wordStart, caretPos).toLowerCase()) &&
+				caretPos - wordStart > 0;
+				wordStart++);
+
+			deleteText(caretPos - wordStart, caretPos);
+			insertText(caretPos - wordStart, selAutoCompEle);
+		});
+
+		textProperty().addListener(observable -> {
+
+			autoCompletePopup.filter(
+				string -> string.toLowerCase().contains(
+					getText().toLowerCase()));
+
+			if (autoCompletePopup.getFilteredSuggestions().isEmpty() ||
+				getText().isEmpty()) {
+
+				// if you remove textField.getText.isEmpty() when text field is empty it suggests all options
+				// so you can choose
+				autoCompletePopup.hide();
+			}
+			else {
+				Bounds caretBounds = getCaretBounds().get();
+				autoCompletePopup.show(
+					this, caretBounds.getMaxX(), caretBounds.getMaxY());
+			}
+		});
 
 	}
 
@@ -103,6 +152,19 @@ public class SQLCodeArea extends CodeArea {
 	public void initScene(Scene scene) {
 		scene.getStylesheets().add(
 			getClass().getResource("sql-keywords.css").toExternalForm());
+	}
+
+	public void initAutoCompletePopup(
+		String oldTable, String newTable, List<String> oldColumns,
+		List<String> newColumns) {
+
+		ObservableList<String> suggestions = autoCompletePopup.getSuggestions();
+
+		suggestions.remove(oldTable);
+		suggestions.add(newTable);
+
+		suggestions.removeAll(oldColumns);
+		suggestions.addAll(newColumns);
 	}
 
 }
