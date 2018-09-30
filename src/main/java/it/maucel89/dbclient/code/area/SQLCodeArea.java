@@ -89,15 +89,30 @@ public class SQLCodeArea extends CodeArea {
 
 		textProperty().addListener(observable -> {
 
+			int caretPos = getCaretPosition();
+
+			if (caretPos == 0) {
+				return;
+			}
+
+			String lastWord = getText();
+
+			if (lastWord.contains(" ") &&
+				lastWord.charAt(lastWord.length() - 1) != ' ') {
+
+				String[] split = lastWord.split("\\s+");
+				lastWord = split[split.length - 1];
+			}
+
+			final String filter = lastWord;
+
 			autoCompletePopup.filter(
 				string -> string.toLowerCase().contains(
-					getText().toLowerCase()));
+					filter.toLowerCase()));
 
 			if (autoCompletePopup.getFilteredSuggestions().isEmpty() ||
 				getText().isEmpty()) {
 
-				// if you remove textField.getText.isEmpty() when text field is empty it suggests all options
-				// so you can choose
 				autoCompletePopup.hide();
 			}
 			else {
