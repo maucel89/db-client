@@ -9,6 +9,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
@@ -16,9 +17,6 @@ import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.util.Callback;
-import org.fxmisc.flowless.VirtualizedScrollPane;
-import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.richtext.LineNumberFactory;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -51,7 +49,11 @@ public class SchemaController extends AbsController {
 	@FXML
 	private SQLCodeArea sqlCodeArea;
 
-	public void initData(DbConnection dbConnection) throws SQLException {
+	public void initData(
+			Scene scene, DbConnection dbConnection)
+		throws SQLException {
+
+		sqlCodeArea.initScene(scene);
 
 		Connection conn = DriverManager.getConnection(
 			dbConnection.getConnectionURL());
@@ -82,14 +84,14 @@ public class SchemaController extends AbsController {
 		tablesListView.setItems(filteredTablesList);
 
 		filterTableTextField.textProperty().addListener(
-			((observable, oldValue, newValue) -> {
+			((observable, oldValue, newValue) ->
 				filteredTablesList.setPredicate(data -> {
 					if (newValue == null || newValue.isEmpty()){
 						return true;
 					}
 					return data.toLowerCase().contains(newValue.toLowerCase());
-				});
-			})
+				})
+			)
 		);
 
 		// Handle ListView selection changes.
@@ -109,6 +111,7 @@ public class SchemaController extends AbsController {
 	}
 
 	private void populateSQLCodeArea(String table) {
+		sqlCodeArea.clear();
 		sqlCodeArea.initCode("SELECT *\nFROM " + table + "\n;\n");
 	}
 

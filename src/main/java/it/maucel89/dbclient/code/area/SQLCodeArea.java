@@ -1,5 +1,6 @@
 package it.maucel89.dbclient.code.area;
 
+import javafx.scene.Scene;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.model.StyleSpans;
@@ -26,7 +27,7 @@ public class SQLCodeArea extends CodeArea {
 		"\\b(" + String.join("|", KEYWORDS) + ")\\b";
 
 	private static final Pattern PATTERN = Pattern.compile(
-		"(?<KEYWORD>" + KEYWORD_PATTERN + ")"
+		"(?i)(?<KEYWORD>" + KEYWORD_PATTERN + ")"
 	);
 
 	public SQLCodeArea() {
@@ -37,21 +38,21 @@ public class SQLCodeArea extends CodeArea {
 			LineNumberFactory.get(this));
 
 		// recompute the syntax highlighting 500 ms after user stops editing area
-		Subscription cleanupWhenNoLongerNeedIt = this
+		Subscription cleanupWhenNoLongerNeedIt =
 
 			// plain changes = ignore style changes that are emitted when syntax
 			// highlighting is reapplied multi plain changes = save computation
 			// by not rerunning the code multiple times when making multiple
 			// changes (e.g. renaming a method at multiple parts in file)
-			.multiPlainChanges()
+			multiPlainChanges()
 
 			// do not emit an event until 500 ms have passed since the last
 			// emission of previous stream
 			.successionEnds(Duration.ofMillis(500))
 
 			// run the following code block when previous stream emits an event
-			.subscribe(ignore -> this.setStyleSpans(
-				0, computeHighlighting(this.getText())));
+			.subscribe(ignore -> setStyleSpans(
+				0, computeHighlighting(getText())));
 
 		// TODO
 		// when no longer need syntax highlighting and wish to clean up memory
@@ -73,7 +74,7 @@ public class SQLCodeArea extends CodeArea {
 		StyleSpansBuilder<Collection<String>> spansBuilder =
 			new StyleSpansBuilder<>();
 
-		while(matcher.find()) {
+		while (matcher.find()) {
 			String styleClass =
 				matcher.group("KEYWORD") != null ? "keyword" :
 //				matcher.group("PAREN") != null ? "paren" :
@@ -97,6 +98,11 @@ public class SQLCodeArea extends CodeArea {
 		spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
 
 		return spansBuilder.create();
+	}
+
+	public void initScene(Scene scene) {
+		scene.getStylesheets().add(
+			getClass().getResource("sql-keywords.css").toExternalForm());
 	}
 
 }

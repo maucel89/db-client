@@ -82,13 +82,14 @@ public class MainController extends AbsController {
 							getClass().getResource("schema/schema.fxml"));
 						Stage stage = new Stage();
 						stage.setTitle("Schema Viewer");
-						stage.setScene(new Scene(loader.load()));
 
+						Scene scene = new Scene(loader.load());
 						SchemaController controller =
 							loader.<SchemaController>getController();
 
-						controller.initData(dbConnection);
+						controller.initData(scene, dbConnection);
 
+						stage.setScene(scene);
 						stage.show();
 
 						// Hide this current window
