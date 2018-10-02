@@ -10,12 +10,9 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.util.Callback;
 
 import java.sql.Connection;
@@ -51,6 +48,12 @@ public class SchemaController extends AbsController {
 
 	@FXML
 	private SQLCodeArea sqlCodeArea;
+
+	@FXML
+    private Button executeQueryButton;
+
+    @FXML
+    private TableView queryTableView;
 
 	public void initData(
 			Scene scene, DbConnection dbConnection)
@@ -112,10 +115,15 @@ public class SchemaController extends AbsController {
 				List<Column> newColumns = new ArrayList<>(
 					columnsTableView.getItems());
 
-				populateTableData(conn, schema, newTable);
+				populateTableData(conn, newTable);
 				populateSQLCodeArea(oldTable, newTable, oldColumns, newColumns);
 			}
 		);
+
+
+        executeQueryButton.setOnAction(event -> {
+            populateTableView(conn, queryTableView, sqlCodeArea.getQuery());
+        });
 
 	}
 
@@ -157,73 +165,80 @@ public class SchemaController extends AbsController {
 	}
 
 	private void populateTableData(
-		Connection conn, String schema, String table) {
+		Connection conn, String table) {
 
-		// EMPTY OLD DATA
-		dataTableView.getItems().clear();
-		dataTableView.getColumns().clear();
+        ObservableList<Column> columns = columnsTableView.getItems();
 
-		ObservableList<Column> columns = columnsTableView.getItems();
+        String sql = "SELECT ";
 
-		try {
+        for (Column column : columns) {
+            sql += column.getName() + ", ";
+        }
+        sql = sql.substring(0, sql.length() - 2);
 
-			String sql = "SELECT ";
+        sql += " FROM " + table;
 
-			for (Column column : columns) {
-				sql += column.getName() + ", ";
-			}
-			sql = sql.substring(0, sql.length() - 2);
+        // TODO Limit or Paginate
 
-			sql += " FROM " + table;
-
-			// TODO Limit or Paginate
-
-			PreparedStatement statement = conn.prepareStatement(sql);
-
-			ResultSet rs = statement.executeQuery();
-
-
-			for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
-				final int j = i;
-
-				TableColumn tableColumn = new TableColumn(
-					rs.getMetaData().getColumnName(i + 1));
-				tableColumn.setCellValueFactory(
-					(Callback<CellDataFeatures<ObservableList, String>,
-						ObservableValue<String>>) param -> {
-
-						String value = "";
-						if (param.getValue().get(j) != null) {
-							value = param.getValue().get(j).toString();
-						}
-						return new SimpleStringProperty(value);
-					}
-
-				);
-
-				dataTableView.getColumns().addAll(tableColumn);
-			}
-
-			while (rs.next()) {
-//				dataTableView.getItems().add(rs);
-				ObservableList<String> row = FXCollections.observableArrayList();
-				for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-					row.add(rs.getString(i));
-				}
-				//System.out.println(row);
-				dataTableView.getItems().add(row);
-			}
-
-		}
-		catch (SQLException ex) {
-			// handle any errors
-			System.out.println("SQLException: " + ex.getMessage());
-			System.out.println("SQLState: " + ex.getSQLState());
-			System.out.println("VendorError: " + ex.getErrorCode());
-
-			showAlert(AlertType.ERROR, "Lettrua dati non riuscita!");
-		}
+	    populateTableView(conn, dataTableView, sql);
 	}
+
+    private void populateTableView(
+        Connection conn, TableView tableView, String sql) {
+
+        // EMPTY OLD DATA
+        tableView.getItems().clear();
+        tableView.getColumns().clear();
+
+        try {
+
+            PreparedStatement statement = conn.prepareStatement(sql);
+
+            ResultSet rs = statement.executeQuery();
+
+
+            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
+                final int j = i;
+
+                TableColumn tableColumn = new TableColumn(
+                        rs.getMetaData().getColumnName(i + 1));
+
+                tableColumn.setCellValueFactory(
+                        (Callback<CellDataFeatures<ObservableList, String>,
+                                ObservableValue<String>>) param -> {
+
+                            String value = "";
+                            if (param.getValue().get(j) != null) {
+                                value = param.getValue().get(j).toString();
+                            }
+                            return new SimpleStringProperty(value);
+                        }
+
+                );
+
+                tableView.getColumns().addAll(tableColumn);
+            }
+
+            while (rs.next()) {
+//				tableView.getItems().add(rs);
+                ObservableList<String> row = FXCollections.observableArrayList();
+                for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+                    row.add(rs.getString(i));
+                }
+                //System.out.println(row);
+                tableView.getItems().add(row);
+            }
+
+        }
+        catch (SQLException ex) {
+            // handle any errors
+            System.out.println("SQLException: " + ex.getMessage());
+            System.out.println("SQLState: " + ex.getSQLState());
+            System.out.println("VendorError: " + ex.getErrorCode());
+
+            showAlert(AlertType.ERROR, "Lettrua dati non riuscita!");
+        }
+    }
 
 
 }
