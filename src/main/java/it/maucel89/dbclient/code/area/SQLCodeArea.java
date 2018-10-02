@@ -35,6 +35,8 @@ public class SQLCodeArea extends CodeArea {
 		"(?i)(?<KEYWORD>" + KEYWORD_PATTERN + ")"
 	);
 
+	private static final char SPACE = ' ';
+
 	private JFXAutoCompletePopup<String> autoCompletePopup =
 		new JFXAutoCompletePopup<>();
 
@@ -83,6 +85,10 @@ public class SQLCodeArea extends CodeArea {
 				caretPos - wordStart > 0;
 				wordStart++);
 
+			if (isSpace(getText(caretPos - wordStart, caretPos).charAt(0))) {
+				wordStart--;
+			}
+
 			deleteText(caretPos - wordStart, caretPos);
 			insertText(caretPos - wordStart, selAutoCompEle);
 		});
@@ -97,8 +103,8 @@ public class SQLCodeArea extends CodeArea {
 
 			String lastWord = getText();
 
-			if (lastWord.contains(" ") &&
-				lastWord.charAt(lastWord.length() - 1) != ' ') {
+			if (lastWord.contains(String.valueOf(SPACE)) &&
+				!isSpace(lastWord.charAt(lastWord.length() - 1))) {
 
 				String[] split = lastWord.split("\\s+");
 				lastWord = split[split.length - 1];
@@ -122,6 +128,10 @@ public class SQLCodeArea extends CodeArea {
 			}
 		});
 
+	}
+
+	private boolean isSpace(char c) {
+		return c == SPACE;
 	}
 
 	public void initCode(String sql) {
