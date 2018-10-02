@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import it.maucel89.dbclient.code.area.SQLCodeArea?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
@@ -11,9 +12,8 @@
 <?import javafx.scene.control.cell.PropertyValueFactory?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.StackPane?>
-<?import it.maucel89.dbclient.code.area.SQLCodeArea?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" prefHeight="700.0" prefWidth="1000.0" fx:controller="it.maucel89.dbclient.schema.SchemaController">
+<AnchorPane prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.maucel89.dbclient.schema.SchemaController">
 	<StackPane fx:id="stackPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 		<children>
 			<SplitPane dividerPositions="0.29797979797979796">
@@ -51,12 +51,8 @@
 									</Tab>
 									<Tab closable="false" text="Columns">
 										<content>
-											<AnchorPane>
+											<AnchorPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 												<children>
-													<ScrollPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-														<content>
-															<AnchorPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-																<children>
 																	<TableView fx:id="columnsTableView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 																		<columns>
 																			<TableColumn prefWidth="30.0" text="#">
@@ -96,10 +92,6 @@
 																			</TableColumn>
 																		</columns>
 																	</TableView>
-																</children>
-															</AnchorPane>
-														</content>
-													</ScrollPane>
 												</children>
 											</AnchorPane>
 										</content>
