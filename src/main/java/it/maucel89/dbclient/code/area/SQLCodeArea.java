@@ -192,4 +192,9 @@ public class SQLCodeArea extends CodeArea {
 		suggestions.addAll(newColumns);
 	}
 
+    public String getQuery() {
+	    // TODO Check if selected text
+	    return getText();
+    }
+
 }
