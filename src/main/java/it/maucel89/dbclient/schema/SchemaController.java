@@ -13,6 +13,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TableColumn.CellDataFeatures;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.util.Callback;
 
 import java.sql.Connection;
@@ -125,6 +128,12 @@ public class SchemaController extends AbsController {
             populateTableView(conn, queryTableView, sqlCodeArea.getQuery());
         });
 
+		sqlCodeArea.setOnKeyPressed(event -> {
+			if (event.isControlDown() && event.getCode() == KeyCode.ENTER) {
+				populateTableView(conn, queryTableView, sqlCodeArea.getQuery());
+			}
+		});
+
 	}
 
 	private void populateSQLCodeArea(
@@ -133,7 +142,6 @@ public class SchemaController extends AbsController {
 
 		sqlCodeArea.clear();
 		sqlCodeArea.initCode("SELECT *\nFROM " + newTable + "\n;\n");
-
 
 		sqlCodeArea.initAutoCompletePopup(
 			oldTable, newTable, Column.toNameList(oldColumns),

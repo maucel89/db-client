@@ -1,6 +1,8 @@
 package it.maucel89.dbclient.code.area;
 
 import com.jfoenix.controls.JFXAutoCompletePopup;
+import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringPool;
 import it.maucel89.dbclient.schema.Column;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
@@ -34,8 +36,6 @@ public class SQLCodeArea extends CodeArea {
 	private static final Pattern PATTERN = Pattern.compile(
 		"(?i)(?<KEYWORD>" + KEYWORD_PATTERN + ")"
 	);
-
-	private static final char SPACE = ' ';
 
 	private JFXAutoCompletePopup<String> autoCompletePopup =
 		new JFXAutoCompletePopup<>();
@@ -103,7 +103,7 @@ public class SQLCodeArea extends CodeArea {
 
 			String lastWord = getText();
 
-			if (lastWord.contains(String.valueOf(SPACE)) &&
+			if (lastWord.contains(StringPool.SPACE) &&
 				!isSpace(lastWord.charAt(lastWord.length() - 1))) {
 
 				String[] split = lastWord.split("\\s+");
@@ -131,7 +131,9 @@ public class SQLCodeArea extends CodeArea {
 	}
 
 	private boolean isSpace(char c) {
-		return c == SPACE;
+		return c == CharPool.SPACE ||
+			   c == CharPool.NEW_LINE ||
+			   c == CharPool.TAB;
 	}
 
 	public void initCode(String sql) {
