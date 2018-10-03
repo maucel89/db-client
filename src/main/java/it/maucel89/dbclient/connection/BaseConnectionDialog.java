@@ -1,5 +1,7 @@
-package it.maucel89.dbclient;
+package it.maucel89.dbclient.connection;
 
+import com.liferay.gradle.util.Validator;
+import it.maucel89.dbclient.DbConnection;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -13,24 +15,29 @@ import javafx.scene.layout.GridPane;
 /**
  * @author Mauro Celani
  */
-public class AddConnectionDialog extends Dialog {
+public abstract class BaseConnectionDialog extends Dialog {
 
-	public AddConnectionDialog() {
-		setTitle("Aggiungi Connessione");
+	public BaseConnectionDialog(ConnectionType connType) {
+
+		setTitle("Aggiungi Connessione " + connType);
+
+		Integer defaultPort = connType.getDefaultPort();
 
 		GridPane grid = new GridPane();
+
 		grid.setHgap(10);
 		grid.setVgap(10);
+
 		grid.setPadding(new Insets(20, 150, 10, 10));
 
 		TextField connectionName = addField(
 			grid, new TextField(), "Connection Name", "Connection Name:");
 
 		TextField hostname = addField(
-			grid, new TextField(), "Hostname", "Hostname:");
+			grid, new TextField(), "localhost", "Hostname:");
 
 		TextField port = addField(
-			grid, new TextField(), "3306", "Port:");
+			grid, new TextField(), defaultPort.toString(), "Port:");
 
 		TextField schema = addField(
 			grid, new TextField(), "Schema", "Schema:");
@@ -55,18 +62,22 @@ public class AddConnectionDialog extends Dialog {
 			if (dialogButton == loginButtonType) {
 
 				String portStr = port.getText();
-				int portN = 3306;
+				int portN = defaultPort;
 				if (!portStr.isEmpty()) {
 					try {
 						portN = Integer.parseInt(portStr);
 					}
 					catch (NumberFormatException e) {
-						// Save default 3306 port
+						// Save default database port
 					}
 				}
 
+				String hostnameStr = Validator.isNotNull(hostname.getText())
+					? hostname.getText()
+					: DEFAULT_HOST;
+
 				return new DbConnection(
-					connectionName.getText(), hostname.getText(), portN,
+					connectionName.getText(), hostnameStr, portN,
 					schema.getText(), username.getText(), password.getText());
 			}
 			return null;
@@ -88,5 +99,7 @@ public class AddConnectionDialog extends Dialog {
 	}
 
 	private int buttonCount = 0;
+
+	private static final String DEFAULT_HOST = "localhost";
 
 }

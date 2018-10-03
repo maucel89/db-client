@@ -1,5 +1,7 @@
 package it.maucel89.dbclient;
 
+import com.liferay.petra.string.StringPool;
+import it.maucel89.dbclient.connection.ConnectionType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -68,7 +70,8 @@ public class DbConnection {
 		return getName();
 	}
 
-	public static void storeDbConncections(List<DbConnection> connections) {
+	public static void storeDbConncections(
+		ConnectionType connType, List<DbConnection> connections) {
 
 		JSONArray connectionsJSON = new JSONArray();
 
@@ -85,7 +88,9 @@ public class DbConnection {
 		}
 	}
 
-	public static List<DbConnection> readDbConncections() {
+	public static List<DbConnection> readDbConncections(
+		ConnectionType connType) {
+
 		try {
 			byte[] bytes = Files.readAllBytes(
 				Paths.get(DB_CONN_FILE));
@@ -142,9 +147,13 @@ public class DbConnection {
 		return json;
 	}
 
-	public String getConnectionURL() {
-		return "jdbc:mysql://" + hostname + ":" + port + "/" + schema +"?" +
-			   "user=" + username + "&password=" + password +
-			   "&serverTimezone=UTC&useSSL=false";
+	public String getMySQLConnectionURL() {
+		return "jdbc" + StringPool.COLON + "mysql" + StringPool.COLON +
+			   StringPool.DOUBLE_SLASH + hostname + StringPool.COLON + port +
+			   StringPool.SLASH + schema + StringPool.QUESTION +
+			   "user" + StringPool.EQUAL + username + StringPool.AMPERSAND +
+			   "password" + StringPool.EQUAL + password + StringPool.AMPERSAND +
+			   "serverTimezone" + StringPool.EQUAL + StringPool.UTC +
+			   StringPool.AMPERSAND + "useSSL" + StringPool.EQUAL + "false";
 	}
 }
