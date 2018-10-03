@@ -176,19 +176,17 @@ public class SQLCodeArea extends CodeArea {
 		return spansBuilder.create();
 	}
 
-	public void initScene(Scene scene) {
+	public void initScene(Scene scene, List<String> tables) {
 		scene.getStylesheets().add(
 			getClass().getResource("sql-keywords.css").toExternalForm());
+
+		autoCompletePopup.getSuggestions().addAll(tables);
 	}
 
 	public void initAutoCompletePopup(
-		String oldTable, String newTable, List<String> oldColumns,
-		List<String> newColumns) {
+		List<String> oldColumns, List<String> newColumns) {
 
 		ObservableList<String> suggestions = autoCompletePopup.getSuggestions();
-
-		suggestions.remove(oldTable);
-		suggestions.add(newTable);
 
 		suggestions.removeAll(oldColumns);
 		suggestions.addAll(newColumns);
