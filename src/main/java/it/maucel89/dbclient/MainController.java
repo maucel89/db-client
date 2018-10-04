@@ -1,7 +1,6 @@
 package it.maucel89.dbclient;
 
 import it.maucel89.dbclient.connection.ConnectionType;
-import it.maucel89.dbclient.connection.dialog.DialogMode;
 import it.maucel89.dbclient.schema.SchemaController;
 import it.maucel89.dbclient.util.AbsController;
 import javafx.collections.FXCollections;
@@ -33,6 +32,9 @@ public class MainController extends AbsController {
 	private Button addConnectionButton;
 
 	@FXML
+    private Button editConnectionButton;
+
+	@FXML
 	private Button removeConnectionButton;
 
 	@FXML
@@ -51,23 +53,52 @@ public class MainController extends AbsController {
 		initConnectionTabPane();
 
 
-		// ADD NEW DATABASE CONNECTION
+        // ADD NEW DATABASE CONNECTION
 
-		addConnectionButton.setOnAction(event -> {
+        addConnectionButton.setOnAction(event -> {
 
-			ConnectionType connType = getConnectionType();
+            ConnectionType connType = getConnectionType();
 
-			Optional<DbConnection> result =
-				connType.getDialog(DialogMode.ADD).showAndWait();
+            Optional<DbConnection> result =
+                    connType.getDialog().showAndWait();
 
-			result.ifPresent(dbConnection -> {
+            result.ifPresent(dbConnection -> {
 
-				connectionsListViewData.get(connType).add(dbConnection);
+                connectionsListViewData.get(connType).add(dbConnection);
 
-				DbConnection.storeDbConncections(connectionsListViewData);
-			});
+                DbConnection.storeDbConncections(connectionsListViewData);
+            });
 
-		});
+        });
+
+
+        // EDIT DATABASE CONNECTION
+
+        editConnectionButton.setOnAction(event -> {
+
+            DbConnection selectedConnection = getSelectedConnection();
+
+            if (selectedConnection != null) {
+
+                ConnectionType connType = getConnectionType();
+
+                final int selectedIdx = connectionsListViewData.get(connType)
+                        .indexOf(selectedConnection);
+
+                Optional<DbConnection> result =
+                        connType.getDialog(selectedConnection).showAndWait();
+
+                result.ifPresent(dbConnection -> {
+
+                    connectionsListViewData.get(connType)
+                            .set(selectedIdx, dbConnection);
+
+                    DbConnection.storeDbConncections(connectionsListViewData);
+                });
+
+            }
+
+        });
 
 
 		// REMOVE DATABASE CONNECTION
@@ -76,20 +107,12 @@ public class MainController extends AbsController {
 
 			ConnectionType connType = getConnectionType();
 
-			ObservableList<DbConnection> selectedItems =
-				connectionsListView.get(connType)
-					.getSelectionModel().getSelectedItems();
+            DbConnection selectedConnection = getSelectedConnection();
 
-			if (selectedItems.isEmpty() || selectedItems.size() > 1) {
-				showAlert(
-					AlertType.WARNING, "Devi selezionare una connessione!");
-			}
-			else {
-				// REMOVE SELECTED CONNECTION
+            if (selectedConnection != null) {
 
-				DbConnection dbConnection = selectedItems.get(0);
-
-				connectionsListViewData.get(connType).remove(dbConnection);
+                connectionsListViewData.get(connType)
+                        .remove(selectedConnection);
 
 				DbConnection.storeDbConncections(connectionsListViewData);
 			}
@@ -100,21 +123,9 @@ public class MainController extends AbsController {
 
 		connectButton.setOnAction(event -> {
 
-			ConnectionType connType = getConnectionType();
+			DbConnection selectedConnection = getSelectedConnection();
 
-			ObservableList<DbConnection> selectedItems = connectionsListView
-				.get(connType)
-				.getSelectionModel()
-				.getSelectedItems();
-
-			if (selectedItems.isEmpty() || selectedItems.size() > 1) {
-				showAlert(
-					AlertType.WARNING, "Devi selezionare una connessione!");
-			}
-			else {
-				// TRY TO CONNECT
-
-				DbConnection dbConnection = selectedItems.get(0);
+			if (selectedConnection != null) {
 
 				try {
 					// Do something with the Connection
@@ -129,7 +140,7 @@ public class MainController extends AbsController {
 					SchemaController controller =
 						loader.<SchemaController>getController();
 
-					controller.initData(scene, dbConnection);
+					controller.initData(scene, selectedConnection);
 
 					stage.setScene(scene);
 					stage.show();
@@ -154,7 +165,28 @@ public class MainController extends AbsController {
 
 	}
 
-	private ConnectionType getConnectionType() {
+	private DbConnection getSelectedConnection() {
+
+        ConnectionType connType = getConnectionType();
+
+        ObservableList<DbConnection> selectedItems = connectionsListView
+                .get(connType)
+                .getSelectionModel()
+                .getSelectedItems();
+
+        if (selectedItems.isEmpty() || selectedItems.size() > 1) {
+
+            showAlert(
+                    AlertType.WARNING, "Devi selezionare una connessione!");
+
+            return null;
+        }
+
+        return selectedItems.get(0);
+    }
+
+    private ConnectionType getConnectionType() {
+
 		String tabId = connectionsTabPane.getSelectionModel()
 			.getSelectedItem().getId();
 
@@ -192,7 +224,6 @@ public class MainController extends AbsController {
 			connTypeTab.setContent(connectionListView);
 
 			connectionsTabPane.getTabs().add(connTypeTab);
-
 		}
 
 	}

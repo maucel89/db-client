@@ -22,9 +22,10 @@
 						<children>
 							<ButtonBar prefHeight="40.0" prefWidth="200.0">
 								<buttons>
-									<Button fx:id="addConnectionButton" mnemonicParsing="false" text="+" />
-									<Button fx:id="removeConnectionButton" mnemonicParsing="false" text="-" />
-									<Button fx:id="connectButton" mnemonicParsing="false" text="Connect" />
+									<Button fx:id="addConnectionButton" mnemonicParsing="false" text="Add" />
+                                    <Button fx:id="editConnectionButton" mnemonicParsing="false" text="Edit" />
+                                    <Button fx:id="removeConnectionButton" mnemonicParsing="false" text="Remove" />
+                                    <Button fx:id="connectButton" mnemonicParsing="false" text="Connect" />
 								</buttons>
 								<opaqueInsets>
 									<Insets />

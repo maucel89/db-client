@@ -1,7 +1,6 @@
 package it.maucel89.dbclient.connection;
 
 import it.maucel89.dbclient.DbConnection;
-import it.maucel89.dbclient.connection.dialog.DialogMode;
 import it.maucel89.dbclient.connection.dialog.MysqlConnectionDialog;
 import it.maucel89.dbclient.connection.dialog.OracleConnectionDialog;
 import javafx.scene.control.Dialog;
@@ -29,16 +28,20 @@ public enum ConnectionType implements ConnectionConstants {
 		return defaultPort;
 	}
 
-	public Dialog getDialog(DialogMode dialogMode) {
+    public Dialog getDialog() {
+	    return getDialog(null);
+    }
+
+    public Dialog getDialog(DbConnection dbConnection) {
 
 		switch (this) {
 
 			case Oracle:
-				return new OracleConnectionDialog(dialogMode);
+				return new OracleConnectionDialog(dbConnection);
 
 			default:
 			case MySQL:
-				return new MysqlConnectionDialog(dialogMode);
+				return new MysqlConnectionDialog(dbConnection);
 		}
 	}
 

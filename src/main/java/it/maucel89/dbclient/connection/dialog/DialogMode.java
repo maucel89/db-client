@@ -5,16 +5,22 @@ package it.maucel89.dbclient.connection.dialog;
  */
 public enum DialogMode {
 
-	ADD("Aggiungi Connessione "),
-	EDIT("Modifica Connessione ");
+	ADD("Aggiungi Connessione ", "Aggiungi"),
+	EDIT("Modifica Connessione ", "Modifica");
 
 	private String title;
+	private String buttonLabel;
 
-	DialogMode(String title) {
+	DialogMode(String title, String buttonLabel) {
 		this.title = title;
+		this.buttonLabel = buttonLabel;
 	}
 
 	public String getTitle() {
 		return title;
 	}
+
+    public String getButtonLabel() {
+	    return buttonLabel;
+    }
 }

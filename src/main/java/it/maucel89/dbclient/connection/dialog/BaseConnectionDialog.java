@@ -19,7 +19,11 @@ import javafx.scene.layout.GridPane;
 public abstract class BaseConnectionDialog extends Dialog {
 
 	public BaseConnectionDialog(
-		DialogMode dialogMode, ConnectionType connType) {
+	        DbConnection selectedConnection, ConnectionType connType) {
+
+	    DialogMode dialogMode = (selectedConnection != null)
+                ? DialogMode.EDIT
+                : DialogMode.ADD;
 
 		setTitle(dialogMode.getTitle() + connType);
 
@@ -50,10 +54,19 @@ public abstract class BaseConnectionDialog extends Dialog {
 		TextField password = addField(
 			grid, new PasswordField(), "Password", "Password:");
 
+		if (dialogMode == DialogMode.EDIT) {
+		    connectionName.setText(selectedConnection.getName());
+		    hostname.setText(selectedConnection.getHostname());
+		    port.setText(String.valueOf(selectedConnection.getPort()));
+		    schema.setText(selectedConnection.getSchema());
+		    username.setText(selectedConnection.getUsername());
+		    password.setText(selectedConnection.getPassword());
+        }
+
 		getDialogPane().setContent(grid);
 
 		ButtonType loginButtonType = new ButtonType(
-			"Aggiungi", ButtonData.OK_DONE);
+			dialogMode.getButtonLabel(), ButtonData.OK_DONE);
 
 		getDialogPane().getButtonTypes().addAll(
 			loginButtonType, ButtonType.CANCEL);

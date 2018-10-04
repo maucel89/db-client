@@ -1,5 +1,6 @@
 package it.maucel89.dbclient.connection.dialog;
 
+import it.maucel89.dbclient.DbConnection;
 import it.maucel89.dbclient.connection.ConnectionType;
 
 /**
@@ -7,8 +8,8 @@ import it.maucel89.dbclient.connection.ConnectionType;
  */
 public class OracleConnectionDialog extends BaseConnectionDialog {
 
-	public OracleConnectionDialog(DialogMode dialogMode) {
-		super(dialogMode, ConnectionType.Oracle);
+	public OracleConnectionDialog(DbConnection selectedConnection) {
+		super(selectedConnection, ConnectionType.Oracle);
 	}
 
 }
