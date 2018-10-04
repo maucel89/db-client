@@ -1,6 +1,5 @@
 package it.maucel89.dbclient;
 
-import it.maucel89.dbclient.connection.AddMysqlConnectionDialog;
 import it.maucel89.dbclient.connection.ConnectionType;
 import it.maucel89.dbclient.schema.SchemaController;
 import it.maucel89.dbclient.util.AbsController;
@@ -13,24 +12,21 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
  * @author Mauro Celani
  */
 public class MainController extends AbsController {
-
-	public MainController() {
-		DbConnection.readDbConncections(ConnectionType.MySQL).forEach(
-			mysqlConnectionsViewData::add);
-
-		DbConnection.readDbConncections(ConnectionType.Oracle).forEach(
-			oracleConnectionsViewData::add);
-	}
 
 	@FXML
 	private Button addConnectionButton;
@@ -42,35 +38,71 @@ public class MainController extends AbsController {
 	private Button connectButton;
 
 	@FXML
-	private ListView<DbConnection> mysqlConnectionsListView;
-	private ObservableList<DbConnection> mysqlConnectionsViewData =
-		FXCollections.observableArrayList();
-
-	@FXML
-	private ListView<DbConnection> oracleConnectionsListView;
-	private ObservableList<DbConnection> oracleConnectionsViewData =
-		FXCollections.observableArrayList();
+	private TabPane connectionsTabPane;
+	private Map<ConnectionType, ListView>
+		connectionsListView = new HashMap<>();
+	private Map<ConnectionType, ObservableList<DbConnection>>
+		connectionsListViewData = new HashMap<>();
 
 	@FXML
 	private void initialize() {
 
-		addConnectionButton.setOnAction(event -> {
-			AddMysqlConnectionDialog dialog = new AddMysqlConnectionDialog();
+		initConnectionTabPane();
 
-			Optional<DbConnection> result = dialog.showAndWait();
+
+		// ADD NEW DATABASE CONNECTION
+
+		addConnectionButton.setOnAction(event -> {
+
+			ConnectionType connType = getConnectionType();
+
+			Optional<DbConnection> result =
+				connType.getAddDialog().showAndWait();
 
 			result.ifPresent(dbConnection -> {
-				mysqlConnectionsViewData.add(dbConnection);
-				DbConnection.storeDbConncections(
-					ConnectionType.MySQL, mysqlConnectionsViewData);
+
+				connectionsListViewData.get(connType).add(dbConnection);
+
+				DbConnection.storeDbConncections(connectionsListViewData);
 			});
 
 		});
 
-		connectButton.setOnAction(event -> {
+
+		// REMOVE DATABASE CONNECTION
+
+		removeConnectionButton.setOnAction(event -> {
+
+			ConnectionType connType = getConnectionType();
 
 			ObservableList<DbConnection> selectedItems =
-				mysqlConnectionsListView.getSelectionModel().getSelectedItems();
+				connectionsListView.get(connType)
+					.getSelectionModel().getSelectedItems();
+
+			if (selectedItems.isEmpty() || selectedItems.size() > 1) {
+				showAlert(
+					AlertType.WARNING, "Devi selezionare una connessione!");
+			}
+			else {
+				// REMOVE SELECTED CONNECTION
+
+				DbConnection dbConnection = selectedItems.get(0);
+
+				connectionsListViewData.get(connType).remove(dbConnection);
+
+				DbConnection.storeDbConncections(connectionsListViewData);
+			}
+		});
+
+
+		// DO CONNECTION
+
+		connectButton.setOnAction(event -> {
+
+			ConnectionType connType = getConnectionType();
+
+			ObservableList<DbConnection> selectedItems =
+				connectionsListView.get(connType).getSelectionModel().getSelectedItems();
 
 			if (selectedItems.isEmpty() || selectedItems.size() > 1) {
 				showAlert(
@@ -120,48 +152,48 @@ public class MainController extends AbsController {
 			}
 		});
 
-		removeConnectionButton.setOnAction(event -> {
+	}
 
-			ObservableList<DbConnection> selectedItems =
-				mysqlConnectionsListView.getSelectionModel().getSelectedItems();
+	private ConnectionType getConnectionType() {
+		String tabId = connectionsTabPane.getSelectionModel()
+			.getSelectedItem().getId();
 
-			if (selectedItems.isEmpty() || selectedItems.size() > 1) {
-				showAlert(
-					AlertType.WARNING, "Devi selezionare una connessione!");
+		return ConnectionType.valueOf(tabId);
+	}
+
+	private void initConnectionTabPane() {
+
+		Map<ConnectionType, List<DbConnection>> savedConnectionsMap =
+			DbConnection.readDbConncections();
+
+		for (ConnectionType connType : ConnectionType.values()) {
+
+			Tab connTypeTab = new Tab(connType.name());
+
+			connTypeTab.setId(connType.name());
+			connTypeTab.setClosable(false);
+
+			connectionsListViewData.put(
+				connType, FXCollections.observableArrayList());
+
+			ObservableList<DbConnection> dbConnectionViewData =
+				connectionsListViewData.get(connType);
+
+			ListView connectionListView = new ListView(dbConnectionViewData);
+
+			connectionsListView.put(
+				connType, connectionListView);
+
+			if (savedConnectionsMap.containsKey(connType)) {
+				dbConnectionViewData.addAll(
+					savedConnectionsMap.get(connType));
 			}
-			else {
-				// REMOVE SELECTED CONNECTION
 
-				DbConnection dbConnection = selectedItems.get(0);
+			connTypeTab.setContent(connectionListView);
 
-				mysqlConnectionsViewData.remove(dbConnection);
+			connectionsTabPane.getTabs().add(connTypeTab);
 
-				DbConnection.storeDbConncections(
-					ConnectionType.MySQL, mysqlConnectionsViewData);
-			}
-		});
-
-
-		// Init ListView.
-		mysqlConnectionsListView.setItems(mysqlConnectionsViewData);
-//		connectionsListView.setCellFactory((list) -> {
-//			return new ListCell<DbConnection>() {
-//				@Override
-//				protected void updateItem(DbConnection item, boolean empty) {
-//					super.updateItem(item, empty);
-//
-//					if (item == null || empty) {
-//						setText(null);
-//					} else {
-//						setText(item.getName());
-//					}
-//				}
-//			};
-//		});
-
-//		// Handle ListView selection changes.
-//		connectionsListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-//		});
+		}
 
 	}
 

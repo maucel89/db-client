@@ -2,6 +2,7 @@ package it.maucel89.dbclient;
 
 import com.liferay.petra.string.StringPool;
 import it.maucel89.dbclient.connection.ConnectionType;
+import javafx.collections.ObservableList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -13,7 +14,9 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Mauro Celani
@@ -71,14 +74,20 @@ public class DbConnection {
 	}
 
 	public static void storeDbConncections(
-		ConnectionType connType, List<DbConnection> connections) {
+		Map<ConnectionType, ObservableList<DbConnection>> connections) {
 
-		JSONArray connectionsJSON = new JSONArray();
+		JSONObject connectionsJSON = new JSONObject();
 
-		for (DbConnection connection : connections) {
-			connectionsJSON.put(connection.toJSON());
+		for (ConnectionType connType : connections.keySet()) {
+
+			JSONArray dbConnectionsJSON = new JSONArray();
+
+			for (DbConnection dbConnection : connections.get(connType)) {
+				dbConnectionsJSON.put(dbConnection.toJSON());
+			}
+
+			connectionsJSON.put(connType.name(), dbConnectionsJSON);
 		}
-
 		try {
 			Files.write(
 				Paths.get(DB_CONN_FILE), connectionsJSON.toString().getBytes());
@@ -88,8 +97,7 @@ public class DbConnection {
 		}
 	}
 
-	public static List<DbConnection> readDbConncections(
-		ConnectionType connType) {
+	public static Map<ConnectionType, List<DbConnection>> readDbConncections() {
 
 		try {
 			byte[] bytes = Files.readAllBytes(
@@ -97,17 +105,29 @@ public class DbConnection {
 
 			String json = new String(bytes, StandardCharsets.UTF_8);
 
-			JSONArray connectionsJSON = new JSONArray(json);
+			JSONObject connectionsJSON = new JSONObject(json);
 
-			List<DbConnection> retList = new ArrayList<>(
-				connectionsJSON.length());
+			Map<ConnectionType, List<DbConnection>> retMap = new HashMap<>();
 
-			for (Object connection : connectionsJSON) {
-				JSONObject jsonObject = (JSONObject) connection;
-				retList.add(DbConnection.fromJSON(jsonObject));
+			for (String connTypeStr : connectionsJSON.keySet()) {
+
+				ConnectionType connType = ConnectionType.valueOf(connTypeStr);
+
+				JSONArray dbConnectionsJSON =
+					connectionsJSON.getJSONArray(connTypeStr);
+
+				List<DbConnection> retList = new ArrayList<>(
+					dbConnectionsJSON.length());
+
+				for (Object connection : dbConnectionsJSON) {
+					JSONObject jsonObject = (JSONObject) connection;
+					retList.add(DbConnection.fromJSON(jsonObject));
+				}
+
+				retMap.put(connType, retList);
 			}
 
-			return retList;
+			return retMap;
 		}
 		catch (NoSuchFileException e) {
 			// No file created yet
@@ -116,7 +136,7 @@ public class DbConnection {
 			e.printStackTrace();
 		}
 
-		return Collections.emptyList();
+		return Collections.emptyMap();
 	}
 
 	private static DbConnection fromJSON(JSONObject jsonObject) {
