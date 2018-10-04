@@ -1,6 +1,7 @@
 package it.maucel89.dbclient;
 
 import it.maucel89.dbclient.connection.ConnectionType;
+import it.maucel89.dbclient.connection.dialog.DialogMode;
 import it.maucel89.dbclient.schema.SchemaController;
 import it.maucel89.dbclient.util.AbsController;
 import javafx.collections.FXCollections;
@@ -57,7 +58,7 @@ public class MainController extends AbsController {
 			ConnectionType connType = getConnectionType();
 
 			Optional<DbConnection> result =
-				connType.getAddDialog().showAndWait();
+				connType.getDialog(DialogMode.ADD).showAndWait();
 
 			result.ifPresent(dbConnection -> {
 

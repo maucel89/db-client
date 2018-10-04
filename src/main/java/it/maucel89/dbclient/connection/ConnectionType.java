@@ -2,6 +2,7 @@ package it.maucel89.dbclient.connection;
 
 import com.liferay.petra.string.StringPool;
 import it.maucel89.dbclient.DbConnection;
+import it.maucel89.dbclient.connection.dialog.DialogMode;
 import it.maucel89.dbclient.connection.dialog.MysqlConnectionDialog;
 import it.maucel89.dbclient.connection.dialog.OracleConnectionDialog;
 import javafx.scene.control.Dialog;
@@ -29,16 +30,16 @@ public enum ConnectionType {
 		return defaultPort;
 	}
 
-	public Dialog getAddDialog() {
+	public Dialog getDialog(DialogMode dialogMode) {
 
 		switch (this) {
 
 			case Oracle:
-				return new OracleConnectionDialog();
+				return new OracleConnectionDialog(dialogMode);
 
 			default:
 			case MySQL:
-				return new MysqlConnectionDialog();
+				return new MysqlConnectionDialog(dialogMode);
 		}
 	}
 
