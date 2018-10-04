@@ -145,6 +145,8 @@ public class SchemaController extends AbsController {
 			System.out.println("SQLState: " + ex.getSQLState());
 			System.out.println("VendorError: " + ex.getErrorCode());
 
+			ex.printStackTrace();
+
 			showAlert(AlertType.ERROR, "Lettura tabelle non riuscita!");
 		}
 	}
@@ -187,7 +189,12 @@ public class SchemaController extends AbsController {
 			System.out.println("SQLState: " + ex.getSQLState());
 			System.out.println("VendorError: " + ex.getErrorCode());
 
-			showAlert(AlertType.ERROR, "Lettrua colonne non riuscita!");
+			if (!ex.getSQLState().equals("99999")) {
+
+				ex.printStackTrace();
+
+				showAlert(AlertType.ERROR, "Lettrua colonne non riuscita!");
+			}
 		}
 	}
 
@@ -223,6 +230,8 @@ public class SchemaController extends AbsController {
 
         try {
 			if (sql != null) {
+
+//				System.out.println(sql);
 
 				PreparedStatement statement = conn.prepareStatement(sql);
 
@@ -270,6 +279,8 @@ public class SchemaController extends AbsController {
             System.out.println("SQLException: " + ex.getMessage());
             System.out.println("SQLState: " + ex.getSQLState());
             System.out.println("VendorError: " + ex.getErrorCode());
+
+			ex.printStackTrace();
 
             showAlert(AlertType.ERROR, "Lettrua dati non riuscita!");
         }

@@ -202,7 +202,9 @@ public class SQLCodeArea extends CodeArea {
 
     public String getQuery() {
 	    // TODO Check if selected text
-	    return getText();
+	    return getText()
+			.replace(CharPool.NEW_LINE, CharPool.SPACE)
+			.replace(StringPool.SEMICOLON, StringPool.BLANK);
     }
 
 }
