@@ -45,6 +45,8 @@ public enum ConnectionType {
 
 	public String getConnectionURL(DbConnection dbConnection) {
 
+		// TODO @see String.format to create url from connectionURL
+
 		switch (this) {
 
 			// TODO Check if is an Oracle SID or Service
