@@ -78,9 +78,9 @@ public class SQLCodeArea extends CodeArea {
 
 			for (
 				wordStart = 1;
+                caretPos - wordStart > 0 &&
 				selAutoCompEle.toLowerCase().contains(
-					getText(caretPos - wordStart, caretPos).toLowerCase()) &&
-				caretPos - wordStart > 0;
+					getText(caretPos - wordStart, caretPos).toLowerCase());
 				wordStart++);
 
 			if (isSpace(getText(caretPos - wordStart, caretPos).charAt(0))) {
@@ -92,20 +92,13 @@ public class SQLCodeArea extends CodeArea {
 		});
 
 		plainTextChanges().subscribe(tc -> {
+
 			String removed = tc.getRemoved();
 			String inserted = tc.getInserted();
-//		});
-//		textProperty().addListener(observable -> {
-
-			int caretPos = getCaretPosition();
-
-			if (caretPos == 0) {
-				return;
-			}
 
 			String lastWord = getText();
 
-			if (removed == StringPool.NEW_LINE) {
+			if (removed.equals(StringPool.NEW_LINE)) {
 				return;
 			}
 
