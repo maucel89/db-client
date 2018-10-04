@@ -68,7 +68,7 @@ public class SchemaController extends AbsController {
 		throws SQLException {
 
 		Connection conn = DriverManager.getConnection(
-			dbConnection.getMySQLConnectionURL());
+			dbConnection.getConnectionURL());
 
 		DatabaseMetaData dbmd = conn.getMetaData();
 

@@ -77,7 +77,7 @@ public abstract class BaseConnectionDialog extends Dialog {
 					: DEFAULT_HOST;
 
 				return new DbConnection(
-					connectionName.getText(), hostnameStr, portN,
+					connType, connectionName.getText(), hostnameStr, portN,
 					schema.getText(), username.getText(), password.getText());
 			}
 			return null;

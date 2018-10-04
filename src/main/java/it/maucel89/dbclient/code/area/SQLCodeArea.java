@@ -93,7 +93,11 @@ public class SQLCodeArea extends CodeArea {
 			insertText(caretPos - wordStart, selAutoCompEle);
 		});
 
-		textProperty().addListener(observable -> {
+		plainTextChanges().subscribe(tc -> {
+			String removed = tc.getRemoved();
+			String inserted = tc.getInserted();
+//		});
+//		textProperty().addListener(observable -> {
 
 			int caretPos = getCaretPosition();
 
@@ -102,6 +106,10 @@ public class SQLCodeArea extends CodeArea {
 			}
 
 			String lastWord = getText();
+
+			if (removed == StringPool.NEW_LINE) {
+				return;
+			}
 
 			if (lastWord.contains(StringPool.SPACE) &&
 				!isSpace(lastWord.charAt(lastWord.length() - 1))) {
@@ -122,9 +130,11 @@ public class SQLCodeArea extends CodeArea {
 				autoCompletePopup.hide();
 			}
 			else {
-				Bounds caretBounds = getCaretBounds().get();
-				autoCompletePopup.show(
-					this, caretBounds.getMaxX(), caretBounds.getMaxY());
+				getCaretBounds().ifPresent(caretBounds ->
+					autoCompletePopup.show(
+						this, caretBounds.getMaxX(), caretBounds.getMaxY()
+					)
+				);
 			}
 		});
 

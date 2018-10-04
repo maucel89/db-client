@@ -24,6 +24,7 @@
     <dependencies>
 
 		<!-- START SUPPORTED DATABASES -->
+
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
@@ -31,10 +32,11 @@
 		</dependency>
 
 		<dependency>
-			<groupId>ojdbc</groupId>
+			<groupId>com.oracle</groupId>
 			<artifactId>ojdbc</artifactId>
-			<version>14</version>
+			<version>6</version>
 		</dependency>
+
 		<!-- END SUPPORTED DATABASES -->
 
 		<dependency>
@@ -70,11 +72,19 @@
 	</dependencies>
 
 	<repositories>
+
+		<repository>
+			<id>central</id>
+			<name>Maven Central</name>
+			<url>http://repo1.maven.org/maven2/</url>
+		</repository>
+
 		<repository>
 			<id>richtextfx-repo</id>
 			<name>RichTextFX Repository</name>
 			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
 		</repository>
+
 	</repositories>
 
 </project>

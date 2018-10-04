@@ -1,6 +1,5 @@
 package it.maucel89.dbclient;
 
-import com.liferay.petra.string.StringPool;
 import it.maucel89.dbclient.connection.ConnectionType;
 import javafx.collections.ObservableList;
 import org.json.JSONArray;
@@ -23,6 +22,7 @@ import java.util.Map;
  */
 public class DbConnection {
 
+	private ConnectionType connType;
 	private String name;
 	private String hostname;
 	private int port;
@@ -33,15 +33,20 @@ public class DbConnection {
 	private String password;
 
 	public DbConnection(
-		String name, String hostname, int port, String schema, String username,
-		String password) {
+		ConnectionType connType, String name, String hostname, int port,
+		String schema, String username, String password) {
 
+		this.connType = connType;
 		this.name = name;
 		this.hostname = hostname;
 		this.port = port;
 		this.schema = schema;
 		this.username = username;
 		this.password = password;
+	}
+
+	public ConnectionType getConnType() {
+		return connType;
 	}
 
 	public String getName() {
@@ -121,7 +126,7 @@ public class DbConnection {
 
 				for (Object connection : dbConnectionsJSON) {
 					JSONObject jsonObject = (JSONObject) connection;
-					retList.add(DbConnection.fromJSON(jsonObject));
+					retList.add(DbConnection.fromJSON(connType, jsonObject));
 				}
 
 				retMap.put(connType, retList);
@@ -139,9 +144,11 @@ public class DbConnection {
 		return Collections.emptyMap();
 	}
 
-	private static DbConnection fromJSON(JSONObject jsonObject) {
+	private static DbConnection fromJSON(
+		ConnectionType connType, JSONObject jsonObject) {
 
 		return new DbConnection(
+			connType,
 			jsonObject.getString("name"),
 			jsonObject.getString("hostname"),
 			jsonObject.getInt("port"),
@@ -167,13 +174,8 @@ public class DbConnection {
 		return json;
 	}
 
-	public String getMySQLConnectionURL() {
-		return "jdbc" + StringPool.COLON + "mysql" + StringPool.COLON +
-			   StringPool.DOUBLE_SLASH + hostname + StringPool.COLON + port +
-			   StringPool.SLASH + schema + StringPool.QUESTION +
-			   "user" + StringPool.EQUAL + username + StringPool.AMPERSAND +
-			   "password" + StringPool.EQUAL + password + StringPool.AMPERSAND +
-			   "serverTimezone" + StringPool.EQUAL + StringPool.UTC +
-			   StringPool.AMPERSAND + "useSSL" + StringPool.EQUAL + "false";
+	public String getConnectionURL() {
+		return connType.getConnectionURL(this);
 	}
+
 }
