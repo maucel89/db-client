@@ -1,7 +1,8 @@
-package it.maucel89.dbclient.connection;
+package it.maucel89.dbclient.connection.dialog;
 
 import com.liferay.gradle.util.Validator;
 import it.maucel89.dbclient.DbConnection;
+import it.maucel89.dbclient.connection.ConnectionType;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -17,9 +18,10 @@ import javafx.scene.layout.GridPane;
  */
 public abstract class BaseConnectionDialog extends Dialog {
 
-	public BaseConnectionDialog(ConnectionType connType) {
+	public BaseConnectionDialog(
+		DialogMode dialogMode, ConnectionType connType) {
 
-		setTitle("Aggiungi Connessione " + connType);
+		setTitle(dialogMode.getTitle() + connType);
 
 		Integer defaultPort = connType.getDefaultPort();
 
