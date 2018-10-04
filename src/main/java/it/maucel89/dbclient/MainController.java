@@ -118,29 +118,26 @@ public class MainController extends AbsController {
 					// Do something with the Connection
 //					showAlert(AlertType.INFORMATION, "Connessione riuscita!");
 
-					try {
-						FXMLLoader loader = new FXMLLoader(
-							getClass().getResource("schema/schema.fxml"));
-						Stage stage = new Stage();
-						stage.setTitle("Schema Viewer");
+					FXMLLoader loader = new FXMLLoader(
+						getClass().getResource("schema/schema.fxml"));
+					Stage stage = new Stage();
+					stage.setTitle("Schema Viewer");
 
-						Scene scene = new Scene(loader.load());
-						SchemaController controller =
-							loader.<SchemaController>getController();
+					Scene scene = new Scene(loader.load());
+					SchemaController controller =
+						loader.<SchemaController>getController();
 
-						controller.initData(scene, dbConnection);
+					controller.initData(scene, dbConnection);
 
-						stage.setScene(scene);
-						stage.show();
+					stage.setScene(scene);
+					stage.show();
 
-						// Hide this current window
-						((Node)(event.getSource())).getScene().getWindow()
-							.hide();
-					}
-					catch (IOException e) {
-						e.printStackTrace();
-					}
-
+					// Hide this current window
+					((Node)(event.getSource())).getScene().getWindow()
+						.hide();
+				}
+				catch (IOException e) {
+					e.printStackTrace();
 				}
 				catch (SQLException ex) {
 					// handle any errors

@@ -74,9 +74,9 @@
 	<repositories>
 
 		<repository>
-			<id>central</id>
-			<name>Maven Central</name>
-			<url>http://repo1.maven.org/maven2/</url>
+			<id>talanlabs</id>
+			<name>TalanLabs</name>
+			<url>http://nexus.talanlabs.com/content/repositories/releases/</url>
 		</repository>
 
 		<repository>

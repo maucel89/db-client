@@ -1,5 +1,6 @@
 package it.maucel89.dbclient;
 
+import com.liferay.petra.string.StringPool;
 import it.maucel89.dbclient.connection.ConnectionType;
 import javafx.collections.ObservableList;
 import org.json.JSONArray;
@@ -11,6 +12,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -178,4 +182,20 @@ public class DbConnection {
 		return connType.getConnectionURL(this);
 	}
 
+	public ResultSet getTables(DatabaseMetaData dbmd) throws SQLException {
+
+		String[] types = { "TABLE" };
+
+		switch (connType) {
+
+			case Oracle:
+				return dbmd.getTables(
+					getSchema(), getUsername(), StringPool.PERCENT, types);
+
+			default:
+			case MySQL:
+				return  dbmd.getTables(
+					getSchema(), null, StringPool.PERCENT, types);
+		}
+	}
 }

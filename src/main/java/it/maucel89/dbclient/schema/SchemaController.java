@@ -132,10 +132,7 @@ public class SchemaController extends AbsController {
 		DatabaseMetaData dbmd, DbConnection dbConnection) {
 
 		try {
-			String[] types = {"TABLE"};
-
-			ResultSet rs = dbmd.getTables(
-				dbConnection.getSchema(), null, StringPool.PERCENT, types);
+			ResultSet rs = dbConnection.getTables(dbmd);
 
 			while (rs.next()) {
 				tablesViewData.add(rs.getString("TABLE_NAME"));
