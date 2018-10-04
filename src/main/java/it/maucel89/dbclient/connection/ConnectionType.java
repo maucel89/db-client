@@ -1,22 +1,21 @@
 package it.maucel89.dbclient.connection;
 
-import com.liferay.petra.string.StringPool;
 import it.maucel89.dbclient.DbConnection;
 import it.maucel89.dbclient.connection.dialog.DialogMode;
 import it.maucel89.dbclient.connection.dialog.MysqlConnectionDialog;
 import it.maucel89.dbclient.connection.dialog.OracleConnectionDialog;
 import javafx.scene.control.Dialog;
 
+import java.text.MessageFormat;
+
 /**
  * @author Mauro Celani
  */
-public enum ConnectionType {
+public enum ConnectionType implements ConnectionConstants {
 
-	MySQL(
-		3306, ""),
+	MySQL(3306, MYSQL_CONNECTION_URL_PATTERN),
 
-	Oracle(
-		1521, "");
+	Oracle(1521, ORACLE_CONNECTION_URL_PATTERN);
 
 	private int defaultPort;
 	private String connectionURL;
@@ -49,28 +48,21 @@ public enum ConnectionType {
 
 		switch (this) {
 
-			// TODO Check if is an Oracle SID or Service
 			// https://docs.oracle.com/cd/E11882_01/appdev.112/e13995/oracle/jdbc/OracleDriver.html
 			case Oracle:
-				return "jdbc:oracle:thin:" + dbConnection.getUsername() +
-					   StringPool.SLASH + dbConnection.getPassword() +
-					   StringPool.AT + dbConnection.getHostname() +
-					   StringPool.COLON + dbConnection.getPort() +
-					   StringPool.COLON + dbConnection.getSchema();
+				return MessageFormat.format(
+					connectionURL, dbConnection.getUsername(),
+					dbConnection.getPassword(), dbConnection.getHostname(),
+					String.valueOf(dbConnection.getPort()),
+					dbConnection.getSchema());
 
 			default:
 			case MySQL:
-				return "jdbc" + StringPool.COLON + "mysql" + StringPool.COLON +
-					   StringPool.DOUBLE_SLASH + dbConnection.getHostname() +
-					   StringPool.COLON + dbConnection.getPort() +
-					   StringPool.SLASH + dbConnection.getSchema() +
-					   StringPool.QUESTION + "user" + StringPool.EQUAL +
-					   dbConnection.getUsername() + StringPool.AMPERSAND +
-					   "password" + StringPool.EQUAL +
-					   dbConnection.getPassword() + StringPool.AMPERSAND +
-					   "serverTimezone" + StringPool.EQUAL + StringPool.UTC +
-					   StringPool.AMPERSAND + "useSSL" + StringPool.EQUAL +
-					   "false";
+				return MessageFormat.format(
+					connectionURL, dbConnection.getHostname(),
+					String.valueOf(dbConnection.getPort()),
+					dbConnection.getSchema(), dbConnection.getUsername(),
+					dbConnection.getPassword());
 		}
 
 	}
