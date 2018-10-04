@@ -102,8 +102,10 @@ public class MainController extends AbsController {
 
 			ConnectionType connType = getConnectionType();
 
-			ObservableList<DbConnection> selectedItems =
-				connectionsListView.get(connType).getSelectionModel().getSelectedItems();
+			ObservableList<DbConnection> selectedItems = connectionsListView
+				.get(connType)
+				.getSelectionModel()
+				.getSelectedItems();
 
 			if (selectedItems.isEmpty() || selectedItems.size() > 1) {
 				showAlert(

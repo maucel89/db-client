@@ -228,7 +228,6 @@ public class SchemaController extends AbsController {
 
 				ResultSet rs = statement.executeQuery();
 
-
 				for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
 					final int j = i;
 
@@ -252,14 +251,16 @@ public class SchemaController extends AbsController {
 				}
 
 				while (rs.next()) {
-					//				tableView.getItems().add(rs);
+
 					ObservableList<String> row =
 						FXCollections.observableArrayList();
-					for (int i = 1; i <= rs.getMetaData().getColumnCount();
-						 i++) {
+
+					int columnCount = rs.getMetaData().getColumnCount();
+
+					for (int i = 1; i <= columnCount; i++) {
 						row.add(rs.getString(i));
 					}
-					//System.out.println(row);
+
 					tableView.getItems().add(row);
 				}
 			}
