@@ -96,11 +96,11 @@ public class SQLCodeArea extends CodeArea {
 			String removed = tc.getRemoved();
 			String inserted = tc.getInserted();
 
-			String lastWord = getText();
-
 			if (removed.equals(StringPool.NEW_LINE)) {
 				return;
 			}
+
+			String lastWord = getText();
 
 			if (lastWord.contains(StringPool.SPACE) &&
 				!isSpace(lastWord.charAt(lastWord.length() - 1))) {
