@@ -2,6 +2,7 @@ package it.maucel89.dbclient.connection.dialog;
 
 import com.liferay.gradle.util.Validator;
 import it.maucel89.dbclient.DbConnection;
+import it.maucel89.dbclient.Main;
 import it.maucel89.dbclient.connection.ConnectionType;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -11,7 +12,9 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 
 /**
  * @author Mauro Celani
@@ -21,7 +24,11 @@ public abstract class BaseConnectionDialog extends Dialog {
 	public BaseConnectionDialog(
 	        DbConnection selectedConnection, ConnectionType connType) {
 
-	    DialogMode dialogMode = (selectedConnection != null)
+		Stage stage = (Stage) getDialogPane().getScene().getWindow();
+		stage.getIcons().add(
+			new Image(Main.class.getResourceAsStream("icon.png")));
+
+		DialogMode dialogMode = (selectedConnection != null)
                 ? DialogMode.EDIT
                 : DialogMode.ADD;
 

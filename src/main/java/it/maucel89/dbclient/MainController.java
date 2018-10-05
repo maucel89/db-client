@@ -14,6 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -133,8 +134,12 @@ public class MainController extends AbsController {
 
 					FXMLLoader loader = new FXMLLoader(
 						getClass().getResource("schema/schema.fxml"));
+
 					Stage stage = new Stage();
+
 					stage.setTitle("Schema Viewer");
+					stage.getIcons().add(
+						new Image(Main.class.getResourceAsStream("icon.png")));
 
 					Scene scene = new Scene(loader.load());
 					SchemaController controller =
